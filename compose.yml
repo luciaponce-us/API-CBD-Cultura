@@ -19,7 +19,10 @@ services:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: dev
+      MONGODB_URI: mongodb://root:root@mongo:27017/mydatabase?authSource=admin
+      SPRING_MONGODB_URI: mongodb://root:root@mongo:27017/mydatabase?authSource=admin
       SPRING_DATA_MONGODB_URI: mongodb://root:root@mongo:27017/mydatabase?authSource=admin
+      FRONTEND_URL: http://localhost:5173
     depends_on:
       - mongo
 

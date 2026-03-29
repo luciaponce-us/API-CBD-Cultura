@@ -1,12 +1,23 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 import './App.css'
 import { Route, Routes } from 'react-router-dom'
+import { fetchDummyData } from './service/DummyService'
 
 function Home() {
   const [count, setCount] = useState(0)
+  
+  useEffect(() => {
+      fetchDummyData()
+        .then((data) => {
+          console.log('Dummy data fetched from backend:', data);
+        })
+        .catch((error) => {
+          console.error('Error fetching dummy data:', error);
+        });
+  }, [])
 
   return (
     <>

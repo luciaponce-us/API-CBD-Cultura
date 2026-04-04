@@ -42,3 +42,26 @@ http://localhost:8080
 docker exec -it mongo-local mongosh -u root -p root --authenticationDatabase admin
 `
     - 🧭 Conexión con MongoDB Compass: [mongodb://root:root@localhost:27018/?authSource=admin](mongodb://root:root@localhost:27018/?authSource=admin)
+
+## Producción (Mongo Atlas)
+
+Para producción, configura la variable `MONGODB_URI` con la cadena de conexión de Atlas.
+
+Ejemplo:
+`mongodb+srv://<user>:<password>@<cluster>.mongodb.net/<database>?retryWrites=true&w=majority`
+
+Notas:
+- `MONGODB_URI` tiene prioridad sobre la URI local.
+- En local puedes seguir usando Docker Compose con `MONGO_USER`, `MONGO_PASS` y `MONGO_DB`.
+
+## Licencia
+
+Este proyecto está bajo la licencia **CC BY-NC 4.0**.
+
+Puedes usarlo y modificarlo siempre que:
+- Des crédito a la autora.
+- No lo uses con fines comerciales.
+
+Autora: Lucía Ponce García de Sola
+
+Puedes ver más detalles en el archivo [LICENSE](./LICENSE).

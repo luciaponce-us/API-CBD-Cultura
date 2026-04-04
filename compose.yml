@@ -13,20 +13,25 @@ services:
       - mongo_data:/data/db
 
   backend:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      target: build
     container_name: tfg-backend
     ports:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      MONGODB_URI: ${MONGO_URI:-mongodb://root:root@mongo:27017/mydatabase?authSource=admin}
-      SPRING_DATA_MONGODB_URI: ${MONGO_URI:-mongodb://root:root@mongo:27017/mydatabase?authSource=admin}
-      SPRING_MONGODB_URI: ${MONGO_URI:-mongodb://root:root@mongo:27017/mydatabase?authSource=admin}
+      MONGODB_URI: ${MONGODB_URI:-mongodb://${MONGO_USER:-root}:${MONGO_PASS:-root}@mongo:27017/${MONGO_DB:-mydatabase}?authSource=admin}
+      SPRING_DATA_MONGODB_URI: ${MONGODB_URI:-mongodb://${MONGO_USER:-root}:${MONGO_PASS:-root}@mongo:27017/${MONGO_DB:-mydatabase}?authSource=admin}
+      SPRING_MONGODB_URI: ${MONGODB_URI:-mongodb://${MONGO_USER:-root}:${MONGO_PASS:-root}@mongo:27017/${MONGO_DB:-mydatabase}?authSource=admin}
+      SPRING_MONGODB_DATABASE: ${MONGO_DB:-mydatabase}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
       SPRING_DEVTOOLS_RESTART_ENABLED: true
+      LOGGING_LEVEL_ROOT: ${LOGGING_LEVEL_ROOT:-DEBUG}
     volumes:
       - ./backend:/app
-      - ./backend/target:/app/target
+      - backend_m2_cache:/root/.m2
     command: ./mvnw spring-boot:run
     depends_on:
       - mongo
@@ -37,7 +42,7 @@ services:
     ports:
       - "5173:5173"
     environment:
-      VITE_API_URL: ${VITE_API_URL:-http://localhost:8080}
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080}
       CHOKIDAR_USEPOLLING: true
     volumes:
       - ./frontend:/app
@@ -48,3 +53,4 @@ services:
 
 volumes:
   mongo_data:
+  backend_m2_cache:

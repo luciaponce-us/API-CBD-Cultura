@@ -10,14 +10,24 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import jakarta.annotation.PostConstruct;
 import java.util.List;
 
 @Configuration
 public class SecurityConfig {
+    
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
     @Value("${app.frontend.url}")
     private String frontendUrl;
+    
+    @PostConstruct
+    public void logConfiguration() {
+        logger.info("Frontend URL configurada: {}", frontendUrl);
+    }
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) {

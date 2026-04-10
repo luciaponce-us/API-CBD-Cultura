@@ -28,7 +28,8 @@
         "esbenp.prettier-vscode",
         "dbaeumer.vscode-eslint",
         "usernamehw.errorlens",
-        "gruntfuggly.todo-tree"
+        "gruntfuggly.todo-tree",
+        "vivaxy.vscode-conventional-commits"
       ],
       "settings": {
         "maven.executable.path": "/workspace/backend/mvnw",

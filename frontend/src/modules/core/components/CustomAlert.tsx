@@ -7,7 +7,7 @@ type Props = {
   message?: string;
 };
 
-export default function CustomAlert({ state, message }: Props) {
+export const CustomAlert = ({ state, message }: Props) => {
   const [visible, setVisible] = useState(true);
   if (!visible) return null;
 

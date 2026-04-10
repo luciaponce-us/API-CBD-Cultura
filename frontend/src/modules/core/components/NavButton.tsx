@@ -7,7 +7,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-export function NavButton({ to, children }: Props) {
+export const NavButton = ({ to, children }: Props) => {
   return (
     <Button
         asChild

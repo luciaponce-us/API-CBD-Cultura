@@ -2,7 +2,7 @@ import { Box, Flex, Heading, Image, Input, InputGroup } from "@chakra-ui/react";
 import { NavButton } from "./NavButton";
 import { IconSearch } from "@tabler/icons-react";
 
-export default function Header() {
+export const Header = () => {
   return (
     <Flex
       as="header"

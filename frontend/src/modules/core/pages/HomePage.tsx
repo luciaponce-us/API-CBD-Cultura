@@ -7,75 +7,71 @@ import {
 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { fetchDummyData, fetchMongoData } from "../service/dummy.service";
-import CustomAlert from "../components/CustomAlert";
-import SocialLink from "../components/SocialLink";
-import SideBar from "../components/SideBar";
+import { CustomAlert, SocialLink, SideBar } from "../components";
 
 export default function Home() {
   return (
-    <>
-      <Grid
-        templateColumns={{ base: "1fr", md: "1fr 4fr 1fr" }}
-        gap={10}
-        height="fit-content"
+    <Grid
+      templateColumns={{ base: "1fr", md: "1fr 4fr 1fr" }}
+      gap={10}
+      flex={1}
+    >
+      {/* IZQUIERDA */}
+      <SideBar>
+        <VStack align="start" gap={0}>
+          <Heading as="h1">Redes sociales</Heading>
+          <VStack align="start" gap={2}>
+            <SocialLink
+              label="Instagram"
+              href="https://www.instagram.com/cultura_etsii/"
+              icon={IconBrandInstagram}
+            />
+            <SocialLink
+              label="X (Twitter)"
+              href="https://x.com/cultura_etsii"
+              icon={IconBrandX}
+            />
+          </VStack>
+        </VStack>
+        <VStack align="start" gap={0}>
+          <Heading as="h1">Comunidades</Heading>
+          <VStack align="start" gap={2}>
+            <SocialLink
+              label="Telegram"
+              href="https://t.me/+SgtDKRourfMxOWQ0#"
+              icon={IconBrandTelegram}
+            />
+            <SocialLink
+              label="Discord"
+              href="https://discord.com/invite/WfGPGUTZJP"
+              icon={IconBrandDiscord}
+            />
+          </VStack>
+        </VStack>
+      </SideBar>
+
+      {/* CENTRO (más ancho) */}
+      <Flex
+        bg="background"
+        borderRadius="xl"
+        boxShadow="lg"
+        p={6}
+        direction="column"
+        align="center"
+        justify="flex-start"
       >
-        {/* IZQUIERDA */}
-        <SideBar>
-          <VStack align="start" gap={0}>
-            <Heading as="h1">Redes sociales</Heading>
-            <VStack align="start" gap={2}>
-              <SocialLink
-                label="Instagram"
-                href="https://www.instagram.com/cultura_etsii/"
-                icon={IconBrandInstagram}
-              />
-              <SocialLink
-                label="X (Twitter)"
-                href="https://x.com/cultura_etsii"
-                icon={IconBrandX}
-              />
-            </VStack>
-          </VStack>
-          <VStack align="start" gap={0}>
-            <Heading as="h1">Comunidades</Heading>
-            <VStack align="start" gap={2}>
-              <SocialLink
-                label="Telegram"
-                href="https://t.me/+SgtDKRourfMxOWQ0#"
-                icon={IconBrandTelegram}
-              />
-              <SocialLink
-                label="Discord"
-                href="https://discord.com/invite/WfGPGUTZJP"
-                icon={IconBrandDiscord}
-              />
-            </VStack>
-          </VStack>
-        </SideBar>
+        <Heading as="h1">Bienvenidos a Cultura ETSII</Heading>
+        <Alerts />
+      </Flex>
 
-        {/* CENTRO (más ancho) */}
-        <Flex
-          bg="background"
-          borderRadius="xl"
-          boxShadow="lg"
-          p={6}
-          direction="column"
-          align="center"
-          justify="flex-start"
-        >
-          <Heading as="h1">Bienvenidos a Cultura ETSII</Heading>
-          <Alerts />
-        </Flex>
-
-        {/* DERECHA */}
-        <SideBar>
-          <VStack align="start" gap={0}>
-            <Heading as="h1">Destacados</Heading>
-            <Text>Próximamente...</Text>
-          </VStack>
-        </SideBar>
-      </Grid>
-    </>
+      {/* DERECHA */}
+      <SideBar>
+        <VStack align="start" gap={0}>
+          <Heading as="h1">Destacados</Heading>
+          <Text>Próximamente...</Text>
+        </VStack>
+      </SideBar>
+    </Grid>
   );
 }
 
@@ -100,7 +96,7 @@ function Alerts() {
       } catch (error) {
         setBackendState("error");
         setBackendMessage(
-          ("No se pudo conectar con el backend. ERROR: " + error) as string,
+          "No se pudo conectar con el backend. ERROR: " + error,
         );
         return;
       }
@@ -114,8 +110,7 @@ function Alerts() {
       } catch (error) {
         setMongoState("error");
         setMongoMessage(
-          ("No se pudo conectar con la base de datos. ERROR: " +
-            error) as string,
+          "No se pudo conectar con la base de datos. ERROR: " + error,
         );
         return;
       }

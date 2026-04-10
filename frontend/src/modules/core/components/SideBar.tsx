@@ -2,7 +2,7 @@ import { Flex } from "@chakra-ui/react";
 
 type Props = React.ComponentProps<typeof Flex>;
 
-export default function SideBar({ children, ...props }: Props) {
+export const SideBar = ({ children, ...props }: Props) => {
   return (
     <Flex
       bg="background"

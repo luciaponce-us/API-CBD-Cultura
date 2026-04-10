@@ -5,7 +5,7 @@ export const system = createSystem(defaultConfig, {
     tokens: {
       colors: {
         principal: {
-          50:  { value: "#EAF1F7" },
+          50: { value: "#EAF1F7" },
           100: { value: "#D3E1EE" },
           200: { value: "#A9C3DB" },
           300: { value: "#7EA4C6" },
@@ -56,7 +56,6 @@ export const system = createSystem(defaultConfig, {
         soft: { value: "0 2px 8px rgba(0,0,0,0.06)" },
         card: { value: "0 4px 12px rgba(0,0,0,0.08)" },
       },
-
     },
   },
   globalCss: {

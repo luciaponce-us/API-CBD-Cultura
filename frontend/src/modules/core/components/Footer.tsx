@@ -15,7 +15,7 @@ import {
   IconBrandDiscord,
   IconMail,
   IconBrandGithub,
-  IconMapPin
+  IconMapPin,
 } from "@tabler/icons-react";
 
 export const Footer = () => {
@@ -27,10 +27,13 @@ export const Footer = () => {
       py={10}
     >
       <Container maxW="6xl">
-        <SimpleGrid templateColumns={{
-    base: "1fr",
-    md: "2fr 1fr 1fr 1fr 1fr",
-  }} gap={8}>
+        <SimpleGrid
+          templateColumns={{
+            base: "1fr",
+            md: "2fr 1fr 1fr 1fr 1fr",
+          }}
+          gap={8}
+        >
           {/* Columna 1 */}
           <Stack>
             <Text fontWeight="bold" fontSize="md">
@@ -149,7 +152,8 @@ export const Footer = () => {
         {/* Bottom bar */}
         <Box mt={10} borderTop="1px solid" borderColor="gray.300" pt={6}>
           <Text fontSize="sm" color="gray.300" textAlign="center">
-            © {new Date().getFullYear()} Lucía Ponce García de Sola. Proyecto bajo licencia CC BY-NC 4.0.
+            © {new Date().getFullYear()} Lucía Ponce García de Sola. Proyecto
+            bajo licencia CC BY-NC 4.0.
           </Text>
         </Box>
       </Container>

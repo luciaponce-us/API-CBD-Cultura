@@ -10,13 +10,13 @@ type Props = {
 export const NavButton = ({ to, children }: Props) => {
   return (
     <Button
-        asChild
-        variant="ghost"
-        color="white"
-        _hover={{
-            bg: "principal.600"
-        }}
-        _active={{
+      asChild
+      variant="ghost"
+      color="white"
+      _hover={{
+        bg: "principal.600",
+      }}
+      _active={{
         bg: "principal.700",
         transform: "scale(0.92)",
       }}
@@ -25,4 +25,4 @@ export const NavButton = ({ to, children }: Props) => {
       <Link to={to}>{children}</Link>
     </Button>
   );
-}
+};

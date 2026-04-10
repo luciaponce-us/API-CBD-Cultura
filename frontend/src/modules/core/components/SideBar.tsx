@@ -20,4 +20,4 @@ export const SideBar = ({ children, ...props }: Props) => {
       {children}
     </Flex>
   );
-}
+};

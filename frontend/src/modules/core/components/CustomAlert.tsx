@@ -68,4 +68,4 @@ export const CustomAlert = ({ state, message }: Props) => {
       />
     </Alert.Root>
   );
-}
+};

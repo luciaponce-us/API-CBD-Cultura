@@ -11,7 +11,7 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ChakraProvider value={system}>
       <BrowserRouter>
-        <App/>
+        <App />
       </BrowserRouter>
     </ChakraProvider>
   </StrictMode>,

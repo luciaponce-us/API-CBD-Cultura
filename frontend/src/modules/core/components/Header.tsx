@@ -27,7 +27,7 @@ export const Header = () => {
       </Flex>
     </Flex>
   );
-}
+};
 
 function Logo() {
   return (

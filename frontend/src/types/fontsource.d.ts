@@ -1,2 +1,2 @@
-declare module '@fontsource/lilita-one';
-declare module '@fontsource/open-sans';
+declare module "@fontsource/lilita-one";
+declare module "@fontsource/open-sans";

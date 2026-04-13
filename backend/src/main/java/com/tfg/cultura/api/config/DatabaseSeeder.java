@@ -4,10 +4,11 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
-import org.bson.Document;
 
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
+import com.tfg.cultura.api.users.model.User;
+import com.tfg.cultura.api.users.model.enumerators.Role;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,23 +56,77 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     private void seedUsuarios() {
         logger.info("👥 Creando colección: usuarios");
-        List<Document> usuarios = new ArrayList<>();
         
-        String now = ZonedDateTime.now().toString();
+        User coordinador = User.builder()
+            .username("coordinador")
+            .name("Álvaro")
+            .surname("Coordinador")
+            .dni("12345678A")
+            .phone("+34600123456")
+            .email("coordinador@cultura.es")
+            .active(true)
+            .role(Role.COORDINADOR)
+            .createdAt(LocalDateTime.now())
+            .build();
         
-        // TODO: Cambiar por estructura de datos real de usuarios // NOSONAR
-        usuarios.add(new Document()
-            .append("_id", "user_1")
-            .append("nombre", "Admin Cultura")
-            .append("email", "admin@cultura.es")
-            .append("rol", "administrador")
-            .append("activo", true)
-            .append("createdAt", now)
+        User secretario = User.builder()
+            .username("secretario")
+            .name("Aurora")
+            .surname("Secretaria")
+            .dni("87654321B")
+            .phone("+34600123457")
+            .email("secretario@cultura.es")
+            .active(true)
+            .role(Role.SECRETARIO)
+            .createdAt(LocalDateTime.now())
+            .build();
+        
+        User encargado = User.builder()
+            .username("encargado")
+            .name("Luis")
+            .surname("Encargado")
+            .dni("11223344C")
+            .phone("+34600123458")
+            .email("encargado@cultura.es")
+            .active(true)
+            .role(Role.ENCARGADO)
+            .createdAt(LocalDateTime.now())
+            .build();
+        
+        User colaborador = User.builder()
+            .username("colaborador")
+            .name("Atenea")
+            .surname("Colaboradora")
+            .dni("44332211D")
+            .phone("+34600123459")
+            .email("colaborador@cultura.es")
+            .active(true)
+            .role(Role.COLABORADOR)
+            .createdAt(LocalDateTime.now())
+            .build();
+        
+        User socio = User.builder()
+            .username("socio")
+            .name("Lucía")
+            .surname("Socia")
+            .dni("55667788E")
+            .phone("+34600123460")
+            .email("socio@cultura.es")
+            .active(true)
+            .role(Role.SOCIO)
+            .createdAt(LocalDateTime.now())
+            .build();
+        
+        List<User> usuarios = List.of(
+            coordinador,
+            secretario,
+            encargado,
+            colaborador,
+            socio
         );
-        
-        mongoTemplate.getCollection("usuarios").insertMany(usuarios);
+
+        mongoTemplate.insertAll(usuarios);
         logger.info("   ✓ Insertados {} usuarios", usuarios.size());
     }
 
 }
-

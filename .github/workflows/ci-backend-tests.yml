@@ -16,7 +16,7 @@ jobs:
         env:
           MONGO_INITDB_ROOT_USERNAME: root
           MONGO_INITDB_ROOT_PASSWORD: root
-          MONGO_INITDB_DATABASE: mydatabase
+          MONGO_INITDB_DATABASE: test
 
     steps:
       - name: Checkout código
@@ -36,7 +36,7 @@ jobs:
       - name: Ejecutar tests backend
         working-directory: backend
         env:
-          MONGODB_URI: mongodb://root:root@localhost:27018/mydatabase?authSource=admin
-          SPRING_DATA_MONGODB_URI: mongodb://root:root@localhost:27018/mydatabase?authSource=admin
-          SPRING_MONGODB_URI: mongodb://root:root@localhost:27018/mydatabase?authSource=admin
+          MONGODB_URI: mongodb://root:root@localhost:27018/test?authSource=admin
+          SPRING_DATA_MONGODB_URI: mongodb://root:root@localhost:27018/test?authSource=admin
+          SPRING_MONGODB_URI: mongodb://root:root@localhost:27018/test?authSource=admin
         run: ./mvnw test --no-transfer-progress

@@ -1,8 +1,9 @@
 package com.tfg.cultura.api.config;
 
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Profile;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.tfg.cultura.api.users.model.User;
@@ -14,20 +15,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Component
-@Profile("seed")
+@ConditionalOnProperty(name = "app.seed.enabled", havingValue = "true")
 public class DatabaseSeeder implements CommandLineRunner {
 
     private final MongoTemplate mongoTemplate;
-    private static final Logger logger = LoggerFactory.getLogger(DatabaseSeeder.class);
+    private final PasswordEncoder passwordEncoder;
 
-    public DatabaseSeeder(MongoTemplate mongoTemplate) {
+    private static final Logger logger = LoggerFactory.getLogger("appLogger");
+
+    public DatabaseSeeder(MongoTemplate mongoTemplate, PasswordEncoder passwordEncoder) {
         this.mongoTemplate = mongoTemplate;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void run(String... args) throws Exception {
         logger.info("🌱 Iniciando Database Seeder...");
-        
+        logger.info(" - Database: {}", mongoTemplate.getDb().getName());
+        logger.info(" - MongoTemplate instance: {}", mongoTemplate);
         try {
             seedDatabase();
             logger.info("✅ Database seeding completado exitosamente");
@@ -55,10 +60,13 @@ public class DatabaseSeeder implements CommandLineRunner {
     }
 
     private void seedUsuarios() {
-        logger.info("👥 Creando colección: usuarios");
-        
+        logger.info("👥 Creando colección: users");
+
+        String password = "cultura123"; //NOSONAR
+
         User coordinador = User.builder()
             .username("coordinador")
+            .password(passwordEncoder.encode(password)) //NOSONAR
             .name("Álvaro")
             .surname("Coordinador")
             .dni("12345678A")
@@ -71,6 +79,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         
         User secretario = User.builder()
             .username("secretario")
+            .password(passwordEncoder.encode(password)) //NOSONAR
             .name("Aurora")
             .surname("Secretaria")
             .dni("87654321B")
@@ -83,6 +92,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         
         User encargado = User.builder()
             .username("encargado")
+            .password(passwordEncoder.encode(password)) //NOSONAR
             .name("Luis")
             .surname("Encargado")
             .dni("11223344C")
@@ -95,6 +105,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         
         User colaborador = User.builder()
             .username("colaborador")
+            .password(passwordEncoder.encode(password)) //NOSONAR
             .name("Atenea")
             .surname("Colaboradora")
             .dni("44332211D")
@@ -107,6 +118,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         
         User socio = User.builder()
             .username("socio")
+            .password(passwordEncoder.encode(password)) //NOSONAR
             .name("Lucía")
             .surname("Socia")
             .dni("55667788E")
@@ -126,7 +138,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         );
 
         mongoTemplate.insertAll(usuarios);
-        logger.info("   ✓ Insertados {} usuarios", usuarios.size());
+        logger.info("✅👥 Insertados {} usuarios", usuarios.size());
     }
 
 }

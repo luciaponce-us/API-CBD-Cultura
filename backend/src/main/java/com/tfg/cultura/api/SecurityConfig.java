@@ -6,12 +6,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import jakarta.annotation.PostConstruct;
 import java.util.List;
@@ -23,19 +24,17 @@ public class SecurityConfig {
 
     @Value("${app.frontend.url}")
     private String frontendUrl;
-    
-    @PostConstruct
-    public void logConfiguration() {
-        logger.info("Frontend URL configurada: {}", frontendUrl);
-    }
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) {
         http
             .cors(Customizer.withDefaults())
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/api", "/api/").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/dummy", "/api/dummy/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/users/register").permitAll()
                 .requestMatchers(
                 // Swagger and API docs
                     "/v3/api-docs/**",
@@ -49,7 +48,8 @@ public class SecurityConfig {
                 ).permitAll()
                 .anyRequest().authenticated()
             )
-            .httpBasic(Customizer.withDefaults());
+            .httpBasic(basic -> basic.disable())
+            .formLogin(form -> form.disable());
 
         return http.build();
     }
@@ -65,5 +65,10 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

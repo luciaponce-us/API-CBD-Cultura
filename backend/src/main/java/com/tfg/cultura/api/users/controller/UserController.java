@@ -8,10 +8,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tfg.cultura.api.users.model.dto.UserResponse;
+import com.tfg.cultura.api.users.model.dto.UserLoginRequest;
 import com.tfg.cultura.api.users.model.dto.UserRegisterRequest;
 import com.tfg.cultura.api.users.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
@@ -22,7 +25,7 @@ public class UserController {
 
     private final UserService userService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService ) {
         this.userService = userService;
     }
 
@@ -30,6 +33,11 @@ public class UserController {
         summary = "RF-01: Registrar usuarios",
         description = "Como usuario, quiero poder solicitar mi registro en el sistema, para poder iniciar sesión.")
     @PostMapping("/register")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Registro correcto"),
+        @ApiResponse(responseCode = "409", description = "RN-01: DNI único por usuario / RN-02: Apodo único por usuario"),
+        @ApiResponse(responseCode = "400", description = "Los datos introducidos no son válidos")
+    })
     public ResponseEntity<UserResponse> register(@Valid @RequestBody UserRegisterRequest request) {
         UserResponse user = userService.register(request);
         
@@ -37,6 +45,25 @@ public class UserController {
             .status(HttpStatus.CREATED)
             .body(user);
         
+    }
+
+    @Operation(
+        summary="RF-02: Iniciar sesión",
+        description = "Como usuario registrado, quiero poder iniciar sesión usando las credenciales con las que me registré previamente, para poder acceder a las funciones del sistema que requieran de autenticación"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Login correcto"),
+        @ApiResponse(responseCode = "401", description = "RN-04: Inicio de sesión - Unauthorized - Credenciales inválidas"),
+        @ApiResponse(responseCode = "403", description = "RN-04: Inicio de sesión - User Disabled"),
+        @ApiResponse(responseCode = "404", description = "RN-04: Inicio de sesión - User Not Found"),
+    })
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@Valid @RequestBody UserLoginRequest request) {
+        String token = userService.login(request);
+
+        return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(token);
     }
     
 }

@@ -26,7 +26,7 @@ public class UserResponse  {
         this.dni = user.getDni();
         this.phone = user.getPhone();
         this.email = user.getEmail();
-        this.active = user.getActive();
+        this.active = user.isActive();
         this.role = user.getRole();
         this.createdAt = user.getCreatedAt();
     }

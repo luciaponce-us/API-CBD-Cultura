@@ -5,5 +5,9 @@ public enum Role {
     SECRETARIO,
     ENCARGADO,
     COLABORADOR,
-    SOCIO
+    SOCIO;
+
+    public String asAuthority() {
+        return "ROLE_" + name();
+    }
 }

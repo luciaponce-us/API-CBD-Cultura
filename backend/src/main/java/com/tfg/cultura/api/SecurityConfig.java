@@ -38,9 +38,9 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+                // Rutas públicas
                 .requestMatchers("/", "/api", "/api/").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/dummy", "/api/dummy/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/users/register").permitAll()
                 .requestMatchers(
                 // Swagger and API docs
                     "/v3/api-docs/**",
@@ -52,6 +52,9 @@ public class SecurityConfig {
                     "/api/docs/**",
                     "/api/swagger-ui/**"
                 ).permitAll()
+                // Users
+                .requestMatchers(HttpMethod.POST, "/api/users/register").permitAll()
+                .requestMatchers(HttpMethod.POST,"/api/users/login").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
@@ -78,4 +81,5 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }

@@ -67,7 +67,7 @@ public class User {
 
     @Builder.Default
     @NotBlank(message = "El campo de activación es obligatorio")
-    private Boolean active = false;
+    private boolean active = false;
 
     @Builder.Default
     @NotBlank(message = "El rol es obligatorio")

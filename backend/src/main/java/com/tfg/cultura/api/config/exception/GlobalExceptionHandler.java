@@ -8,60 +8,31 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-
-import com.tfg.cultura.api.users.exception.*;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     
     private static final Logger logger = LoggerFactory.getLogger("appLogger");
+
+    private final ApiErrorBuilder apiErrorBuilder;
+
+    public GlobalExceptionHandler(ApiErrorBuilder apiErrorBuilder) {
+        this.apiErrorBuilder = apiErrorBuilder;
+    }
     
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationException(MethodArgumentNotValidException ex) {
-        logger.warn("Validation error: {}", ex.getMessage());
-        
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", HttpStatus.BAD_REQUEST.value());
-        response.put("message", "Errores de validación");
-        Map<String, String> errors = new HashMap<>();
-        response.put("errors", errors);
-        
-        ex.getBindingResult().getFieldErrors().forEach(error -> {
-            errors.put(error.getField(), error.getDefaultMessage());
-            logger.debug("Validation error in field '{}': {}", error.getField(), error.getDefaultMessage());
-        });
-        
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ApiError> handleValidationException(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult()
+            .getFieldErrors()
+            .stream()
+            .map(error -> "Campo " + error.getField() + ": " + error.getDefaultMessage())
+            .collect(Collectors.joining(". "));
+
+        return apiErrorBuilder.build(ex,HttpStatus.BAD_REQUEST,"Errores de validación",logger,message);
     }
+
     
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handleUnexpectedException(Exception ex) {
-        
-        ApiError response = ApiError.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .error(ex.getClass().getSimpleName())
-                .message(ex.getMessage() != null ? ex.getMessage() : "Ocurrió un error inesperado")
-                .build();
+    
 
-        logger.error("Ocurrió un error inesperado: {} - {}",response.getError(), response.getMessage());
-        
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(UserAlreadyExistsException.class)
-    public ResponseEntity<ApiError> handleUserAlreadyExistsException(UserAlreadyExistsException ex) {
-        
-        ApiError response = ApiError.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.CONFLICT.value())
-                .error("User Already Exists")
-                .message(ex.getMessage())
-                .build();
-        
-        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
-    }
 }

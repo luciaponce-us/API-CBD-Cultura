@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import com.tfg.cultura.api.users.validation.annotations.ValidPhone;
@@ -64,6 +65,12 @@ public class User {
     @Email(message = "El email no es válido")
     @NotBlank(message = "El email es obligatorio")
     private String email;
+
+    @Pattern(
+        regexp = "^https://res\\.cloudinary\\.com/[^/]+/(image|raw|video)/upload/.+",
+        message = "URL de Cloudinary no válida"
+    )
+    private String avatar;
 
     @Builder.Default
     @NotBlank(message = "El campo de activación es obligatorio")

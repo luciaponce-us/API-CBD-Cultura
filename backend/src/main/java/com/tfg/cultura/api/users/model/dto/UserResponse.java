@@ -15,6 +15,7 @@ public class UserResponse  {
     private String dni;
     private String phone;
     private String email;
+    private String avatar;
     private Boolean active;
     private Role role;
     private LocalDateTime createdAt;
@@ -26,6 +27,7 @@ public class UserResponse  {
         this.dni = user.getDni();
         this.phone = user.getPhone();
         this.email = user.getEmail();
+        this.avatar = user.getAvatar();
         this.active = user.isActive();
         this.role = user.getRole();
         this.createdAt = user.getCreatedAt();

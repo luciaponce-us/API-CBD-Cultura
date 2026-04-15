@@ -1,5 +1,8 @@
 package com.tfg.cultura.api.users.model.dto;
 
+import org.springframework.web.multipart.MultipartFile;
+
+import com.tfg.cultura.api.core.validation.annotations.ValidImage;
 import com.tfg.cultura.api.users.validation.annotations.ValidDni;
 import com.tfg.cultura.api.users.validation.annotations.ValidPhone;
 
@@ -49,4 +52,7 @@ public class UserRegisterRequest {
     @Size(min = 5, max = 254, message = "El email debe tener entre 5 y 254 caracteres")
     @Email(message = "El email no es válido")
     private String email;
+
+    @ValidImage
+    private MultipartFile avatar;
 }

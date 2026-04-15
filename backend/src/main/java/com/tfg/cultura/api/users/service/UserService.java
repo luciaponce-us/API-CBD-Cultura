@@ -4,12 +4,15 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.tfg.cultura.api.users.repository.UserRepository;
 
 import com.tfg.cultura.api.users.model.User;
 import com.tfg.cultura.api.users.model.dto.*;
-
+import com.cloudinary.Transformation;
+import com.tfg.cultura.api.core.model.dto.FileUploadRequest;
+import com.tfg.cultura.api.core.service.FileService;
 import com.tfg.cultura.api.users.exception.*;
 import com.tfg.cultura.api.users.jwt.CustomUserDetails;
 import com.tfg.cultura.api.users.jwt.CustomUserDetailsService;
@@ -27,13 +30,17 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
+    private final FileService fileService;
+
+    private static final String AVATAR_PLACEHOLDER = "https://res.cloudinary.com/dubz79y98/image/upload/v1776288595/avatar_placeholder_dreac3.png";
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService,
-            CustomUserDetailsService userDetailsService) {
+            CustomUserDetailsService userDetailsService, FileService fileService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
+        this.fileService = fileService;
     }
 
     private static final Logger logger = LoggerFactory.getLogger("usersLogger");
@@ -59,7 +66,14 @@ public class UserService {
                 .dni(request.getDni())
                 .phone(request.getPhone())
                 .email(request.getEmail())
+                .avatar(AVATAR_PLACEHOLDER)
                 .build();
+        
+        logger.info("Se va a intentar subir el avatar: {}", request.getAvatar());
+        if (request.getAvatar()!=null && !request.getAvatar().isEmpty()){
+            String avatarUrl = uploadAvatar(request.getUsername(), request.getAvatar());
+            user.setAvatar(avatarUrl);
+        }
 
         User savedUser = userRepository.save(user);
         logger.info("Usuario registrado correctamente: {}", savedUser.getUsername());
@@ -91,4 +105,19 @@ public class UserService {
                 userDetails.getRole(),
                 userDetails.getId());
     }
+
+    public String uploadAvatar(String userId, MultipartFile file) {
+        FileUploadRequest request = FileUploadRequest.builder()
+            .file(file)
+            .folder("avatars")
+            .publicId("user_"+userId)
+            .transformation(new Transformation()
+                .width(300)
+                .height(300)
+                .crop("fill"))
+            .build();
+
+        return fileService.uploadFile(request);
+    }
+
 }

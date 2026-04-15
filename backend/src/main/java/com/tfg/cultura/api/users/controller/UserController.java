@@ -5,7 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.tfg.cultura.api.users.model.dto.UserResponse;
 import com.tfg.cultura.api.users.model.dto.UserLoginRequest;
@@ -38,7 +40,8 @@ public class UserController {
         @ApiResponse(responseCode = "409", description = "RN-01: DNI único por usuario / RN-02: Apodo único por usuario"),
         @ApiResponse(responseCode = "400", description = "Los datos introducidos no son válidos")
     })
-    public ResponseEntity<UserResponse> register(@Valid @RequestBody UserRegisterRequest request) {
+    public ResponseEntity<UserResponse> register(@Valid @RequestBody UserRegisterRequest request, @RequestParam(value = "avatar", required = false) MultipartFile avatar) {
+        request.setAvatar(avatar);
         UserResponse user = userService.register(request);
         
         return ResponseEntity

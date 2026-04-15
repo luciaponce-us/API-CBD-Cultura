@@ -19,6 +19,9 @@ public class MongoConfiguration {
     @Value("${spring.data.mongodb.uri}")
     private String mongoUri;
 
+    @Value("${spring.data.mongodb.database:cultura_db}")
+    private String mongoDatabase;
+
     @Bean
     @Primary
     public MongoClient mongoClient() {
@@ -28,7 +31,7 @@ public class MongoConfiguration {
 
     @Bean
     public MongoTemplate mongoTemplate(MongoClient mongoClient) {
-        return new MongoTemplate(mongoClient, "cultura_db");
+        return new MongoTemplate(mongoClient, mongoDatabase);
     }
 
 }

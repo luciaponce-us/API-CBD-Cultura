@@ -36,7 +36,5 @@ jobs:
       - name: Ejecutar tests backend
         working-directory: backend
         env:
-          MONGODB_URI: mongodb://root:root@localhost:27018/test?authSource=admin
-          SPRING_DATA_MONGODB_URI: mongodb://root:root@localhost:27018/test?authSource=admin
-          SPRING_MONGODB_URI: mongodb://root:root@localhost:27018/test?authSource=admin
+          SPRING_PROFILES_ACTIVE: test
         run: ./mvnw test --no-transfer-progress

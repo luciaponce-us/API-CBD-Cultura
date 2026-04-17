@@ -68,9 +68,9 @@ public class UserService {
                 .email(request.getEmail())
                 .avatar(AVATAR_PLACEHOLDER)
                 .build();
-        
+
         logger.info("Se va a intentar subir el avatar: {}", request.getAvatar().getOriginalFilename());
-        if (request.getAvatar()!=null && !request.getAvatar().isEmpty()){
+        if (request.getAvatar() != null && !request.getAvatar().isEmpty()) {
             String avatarUrl = uploadAvatar(request.getUsername(), request.getAvatar());
             user.setAvatar(avatarUrl);
         }
@@ -94,11 +94,13 @@ public class UserService {
         }
 
         if (!passwordEncoder.matches(request.getPassword(), foundUser.getPassword())) {
-            logger.warn("Error al iniciar sesión: El usuario {} introdujo una contraseña incorrecta", request.getUsername());
+            logger.warn("Error al iniciar sesión: El usuario {} introdujo una contraseña incorrecta",
+                    request.getUsername());
             throw new BadCredentialsException("Credenciales inválidaaaas");
         }
 
-        CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(request.getUsername());
+        CustomUserDetails userDetails = (CustomUserDetails) userDetailsService
+                .loadUserByUsername(request.getUsername());
 
         return jwtService.generateToken(
                 userDetails.getUsername(),
@@ -107,17 +109,24 @@ public class UserService {
     }
 
     public String uploadAvatar(String userId, MultipartFile file) {
-        FileUploadRequest request = FileUploadRequest.builder()
-            .file(file)
-            .folder("avatars")
-            .publicId("user_"+userId)
-            .transformation(new Transformation()
-                .width(300)
-                .height(300)
-                .crop("fill"))
-            .build();
+        try {
+            FileUploadRequest request = FileUploadRequest.builder()
+                    .file(file)
+                    .folder("avatars")
+                    .publicId("user_" + userId)
+                    .transformation(new Transformation()
+                            .width(300)
+                            .height(300)
+                            .crop("fill"))
+                    .build();
 
-        return fileService.uploadFile(request);
+            return fileService.uploadFile(request);
+        } catch (Exception ex) {
+            logger.error("No se ha podido subir el avatar {} para el usuario con id {}: {}", file.getOriginalFilename(),
+                    userId, ex.getMessage());
+            return AVATAR_PLACEHOLDER;
+        }
+
     }
 
 }

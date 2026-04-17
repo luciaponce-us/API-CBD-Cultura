@@ -69,7 +69,7 @@ public class UserService {
                 .avatar(AVATAR_PLACEHOLDER)
                 .build();
         
-        logger.info("Se va a intentar subir el avatar: {}", request.getAvatar());
+        logger.info("Se va a intentar subir el avatar: {}", request.getAvatar().getOriginalFilename());
         if (request.getAvatar()!=null && !request.getAvatar().isEmpty()){
             String avatarUrl = uploadAvatar(request.getUsername(), request.getAvatar());
             user.setAvatar(avatarUrl);

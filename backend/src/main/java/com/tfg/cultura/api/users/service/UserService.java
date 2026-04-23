@@ -32,7 +32,7 @@ public class UserService {
     private final CustomUserDetailsService userDetailsService;
     private final FileService fileService;
 
-    private static final String AVATAR_PLACEHOLDER = "https://res.cloudinary.com/dubz79y98/image/upload/v1776288595/avatar_placeholder_dreac3.png";
+    public static final String AVATAR_PLACEHOLDER = "https://res.cloudinary.com/dubz79y98/image/upload/v1776288595/avatar_placeholder_dreac3.png";
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService,
             CustomUserDetailsService userDetailsService, FileService fileService) {
@@ -69,8 +69,9 @@ public class UserService {
                 .avatar(AVATAR_PLACEHOLDER)
                 .build();
 
-        logger.info("Se va a intentar subir el avatar: {}", request.getAvatar().getOriginalFilename());
+        
         if (request.getAvatar() != null && !request.getAvatar().isEmpty()) {
+            logger.info("Se va a intentar subir el avatar: {}", request.getAvatar().getOriginalFilename());
             String avatarUrl = uploadAvatar(request.getUsername(), request.getAvatar());
             user.setAvatar(avatarUrl);
         }
@@ -112,7 +113,7 @@ public class UserService {
         try {
             FileUploadRequest request = FileUploadRequest.builder()
                     .file(file)
-                    .folder("avatars")
+                    .folder("cultura/avatars")
                     .publicId("user_" + userId)
                     .transformation(new Transformation()
                             .width(300)

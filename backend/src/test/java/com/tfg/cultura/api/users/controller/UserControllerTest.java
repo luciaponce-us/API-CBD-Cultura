@@ -14,8 +14,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-import com.tfg.cultura.api.config.exception.ApiErrorBuilder;
-import com.tfg.cultura.api.config.exception.GlobalExceptionHandler;
+import com.tfg.cultura.api.core.exception.ApiErrorBuilder;
+import com.tfg.cultura.api.core.exception.GlobalExceptionHandler;
 import com.tfg.cultura.api.users.exception.UserAlreadyExistsException;
 import com.tfg.cultura.api.users.exception.UserNotFoundException;
 import com.tfg.cultura.api.users.exception.UsersExceptionHandler;
@@ -33,166 +33,163 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class UserControllerTest {
+    private MockMvc mockMvc;
+    private UserService userService;
+    private static final String BASE_URL = "/api/users";
+    private static final String REGISTER_URL = BASE_URL + "/register";
+    private static final String LOGIN_URL = BASE_URL + "/login";
 
-        private MockMvc mockMvc;
+    private UserRegisterRequest registerRequest;
+    private UserLoginRequest loginRequest;
+    private UserResponse userResponse;
+    private ApiErrorBuilder apiErrorBuilder = new ApiErrorBuilder();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-        private UserService userService;
+    @BeforeEach
+    void setup() {
+        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
+        validator.afterPropertiesSet();
 
-        private static final String BASE_URL = "/api/users";
-        private static final String REGISTER_URL = BASE_URL + "/register";
-        private static final String LOGIN_URL = BASE_URL + "/login";
+        userService = Mockito.mock(UserService.class);
 
-        private UserRegisterRequest registerRequest;
-        private UserLoginRequest loginRequest;
-        private UserResponse userResponse;
-        private ApiErrorBuilder apiErrorBuilder = new ApiErrorBuilder();
-        private final ObjectMapper objectMapper = new ObjectMapper();
+        UserController controller = new UserController(userService);
 
-        @BeforeEach
-        void setup() {
-                LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
-                validator.afterPropertiesSet();
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(controller)
+                .setValidator(validator)
+                .setControllerAdvice(
+                        new GlobalExceptionHandler(apiErrorBuilder),
+                        new UsersExceptionHandler(apiErrorBuilder))
+                .build();
 
-                userService = Mockito.mock(UserService.class);
+        registerRequest = UserRegisterRequest.builder()
+                .username("test")
+                .password("12345678")
+                .name("John")
+                .surname("Doe")
+                .dni("12345678Z")
+                .phone("600123123")
+                .email("test@test.com")
+                .build();
 
-                UserController controller = new UserController(userService);
+        User createdUser = User.builder()
+                .username("test")
+                .password("12345678-encrypted")
+                .name("John")
+                .surname("Doe")
+                .dni("12345678Z")
+                .phone("600123123")
+                .email("test@test.com")
+                .build();
 
-                mockMvc = MockMvcBuilders
-                                .standaloneSetup(controller)
-                                .setValidator(validator)
-                                .setControllerAdvice(
-                                                new GlobalExceptionHandler(apiErrorBuilder),
-                                                new UsersExceptionHandler(apiErrorBuilder))
-                                .build();
+        userResponse = new UserResponse(createdUser);
 
-                registerRequest = UserRegisterRequest.builder()
-                                .username("test")
-                                .password("12345678")
-                                .name("John")
-                                .surname("Doe")
-                                .dni("12345678Z")
-                                .phone("600123123")
-                                .email("test@test.com")
-                                .build();
+        loginRequest = UserLoginRequest.builder()
+                .username("test")
+                .password("12345678")
+                .build();
 
-                User createdUser = User.builder()
-                                .username("test")
-                                .password("12345678-encrypted")
-                                .name("John")
-                                .surname("Doe")
-                                .dni("12345678Z")
-                                .phone("600123123")
-                                .email("test@test.com")
-                                .build();
+    }
 
-                userResponse = new UserResponse(createdUser);
+    @Test
+    void register_success() throws Exception {
+        when(userService.register(any())).thenReturn(userResponse);
 
-                loginRequest = UserLoginRequest.builder()
-                                .username("test")
-                                .password("12345678")
-                                .build();
+        mockMvc.perform(multipart(REGISTER_URL)
+                .file(userPart(registerRequest)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.username").value(registerRequest.getUsername()));
+    }
 
-        }
+    @Test
+    void register_fail_user_already_exists() throws Exception {
+        UserAlreadyExistsException ex = new UserAlreadyExistsException("El nombre de usuario ya existe");
 
-        @Test
-        void register_success() throws Exception {
-                when(userService.register(any())).thenReturn(userResponse);
+        when(userService.register(any())).thenThrow(ex);
 
-                mockMvc.perform(multipart(REGISTER_URL)
-                                .file(userPart(registerRequest)))
-                                .andExpect(status().isCreated())
-                                .andExpect(jsonPath("$.username").value(registerRequest.getUsername()));
-        }
+        mockMvc.perform(multipart(REGISTER_URL)
+                .file(userPart(registerRequest)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").exists());
+    }
 
-        @Test
-        void register_fail_user_already_exists() throws Exception {
-                UserAlreadyExistsException ex = new UserAlreadyExistsException("El nombre de usuario ya existe");
+    @Test
+    void register_fail_invalid_data() throws Exception {
+        registerRequest.setEmail("invalid-email");
 
-                when(userService.register(any())).thenThrow(ex);
+        mockMvc.perform(multipart(REGISTER_URL)
+                .file(userPart(registerRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").exists());
+    }
 
-                mockMvc.perform(multipart(REGISTER_URL)
-                                .file(userPart(registerRequest)))
-                                .andExpect(status().isConflict())
-                                .andExpect(jsonPath("$.message").exists());
-        }
+    // ====== LOGIN ========
 
-        @Test
-        void register_fail_invalid_data() throws Exception {
-                registerRequest.setEmail("invalid-email");
+    @Test
+    void login_success() throws Exception {
+        String token = "token123";
+        when(userService.login(any())).thenReturn(token);
 
-                mockMvc.perform(multipart(REGISTER_URL)
-                                .file(userPart(registerRequest)))
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.message").exists());
-        }
+        mockMvc.perform(post(LOGIN_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(loginRequest)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(token));
 
-        // ====== LOGIN ========
+    }
 
-        @Test
-        void login_success() throws Exception {
-                String token = "token123";
-                when(userService.login(any())).thenReturn(token);
+    @Test
+    void login_fail_invalid_credentials() throws Exception {
+        BadCredentialsException ex = new BadCredentialsException("Credenciales inválidas");
+        when(userService.login(any())).thenThrow(ex);
 
-                mockMvc.perform(post(LOGIN_URL)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(toJson(loginRequest)))
-                                .andExpect(status().isOk())
-                                .andExpect(content().string(token));
+        mockMvc.perform(post(LOGIN_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(loginRequest)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value(ex.getMessage()));
 
-        }
+    }
 
-        @Test
-        void login_fail_invalid_credentials() throws Exception {
-                BadCredentialsException ex = new BadCredentialsException("Credenciales inválidas");
-                when(userService.login(any())).thenThrow(ex);
+    @Test
+    void login_fail_user_not_found() throws Exception {
+        String username = loginRequest.getUsername();
+        String message = "El usuario con username " + username + " no existe";
+        UserNotFoundException ex = new UserNotFoundException(message);
+        when(userService.login(any())).thenThrow(ex);
 
-                mockMvc.perform(post(LOGIN_URL)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(toJson(loginRequest)))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$.message").value(ex.getMessage()));
+        mockMvc.perform(post(LOGIN_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(loginRequest)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value(message));
+    }
 
-        }
+    @Test
+    void login_fail_user_disabled() throws Exception {
+        String message = "El usuario está desactivado";
+        DisabledException ex = new DisabledException(message);
+        when(userService.login(any())).thenThrow(ex);
 
-        @Test
-        void login_fail_user_not_found() throws Exception {
-                String username = loginRequest.getUsername();
-                String message = "El usuario con username " + username + " no existe";
-                UserNotFoundException ex = new UserNotFoundException(message);
-                when(userService.login(any())).thenThrow(ex);
+        mockMvc.perform(post(LOGIN_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(loginRequest)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value(message));
+    }
 
-                mockMvc.perform(post(LOGIN_URL)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(toJson(loginRequest)))
-                                .andExpect(status().isNotFound())
-                                .andExpect(jsonPath("$.message").value(message));
-        }
+    // Helpers
 
-        @Test
-        void login_fail_user_disabled() throws Exception {
-                String message = "El usuario está desactivado";
-                DisabledException ex = new DisabledException(message);
-                when(userService.login(any())).thenThrow(ex);
+    private String toJson(Object obj) throws Exception {
+        return objectMapper.writeValueAsString(obj);
+    }
 
-                mockMvc.perform(post(LOGIN_URL)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(toJson(loginRequest)))
-                                .andExpect(status().isForbidden())
-                                .andExpect(jsonPath("$.message").value(message));
-        }
-
-        // Helpers
-
-        private String toJson(Object obj) throws Exception {
-                return objectMapper.writeValueAsString(obj);
-        }
-
-        private MockMultipartFile userPart(Object obj) throws Exception {
-                return new MockMultipartFile(
-                                "user",
-                                "",
-                                "application/json",
-                                toJson(obj).getBytes());
-        }
+    private MockMultipartFile userPart(Object obj) throws Exception {
+        return new MockMultipartFile(
+                "user",
+                "",
+                "application/json",
+                toJson(obj).getBytes());
+    }
 
 }

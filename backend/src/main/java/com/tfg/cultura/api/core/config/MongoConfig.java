@@ -1,4 +1,4 @@
-package com.tfg.cultura.api;
+package com.tfg.cultura.api.core.config;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 @Configuration
-public class MongoConfiguration {
+public class MongoConfig {
 
     private static final Logger log = LoggerFactory.getLogger("appLogger");
 

@@ -1,4 +1,4 @@
-package com.tfg.cultura.api.config;
+package com.tfg.cultura.api.core.config;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

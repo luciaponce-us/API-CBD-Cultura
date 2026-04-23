@@ -1,14 +1,12 @@
 package com.tfg.cultura.api.core.service;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.imageio.ImageIO;
 
 import org.springframework.stereotype.Service;
 
 import com.cloudinary.Cloudinary;
+import com.tfg.cultura.api.core.exception.FileUploadException;
 import com.tfg.cultura.api.core.model.dto.FileUploadRequest;
 
 @Service
@@ -39,15 +37,16 @@ public class FileService {
                 options.put("transformation",request.getTransformation());
             }
 
-            Map uploadResult = cloudinary.uploader().upload(
+            @SuppressWarnings("unchecked")
+            Map<String, Object> uploadResult = cloudinary.uploader().upload(
                     request.getFile().getBytes(),
                     options
             );
 
             return uploadResult.get("secure_url").toString();
 
-        } catch (IOException e) {
-            throw new RuntimeException("Error subiendo archivo", e);
+        } catch (Exception e) {
+            throw new FileUploadException(e.getMessage());
         }
     }
     

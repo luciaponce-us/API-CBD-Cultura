@@ -1,4 +1,4 @@
-package com.tfg.cultura.api.config;
+package com.tfg.cultura.api.core.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

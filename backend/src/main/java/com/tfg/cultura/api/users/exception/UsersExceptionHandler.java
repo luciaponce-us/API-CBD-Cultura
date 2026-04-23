@@ -7,8 +7,8 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.tfg.cultura.api.config.exception.ApiError;
-import com.tfg.cultura.api.config.exception.ApiErrorBuilder;
+import com.tfg.cultura.api.core.exception.ApiError;
+import com.tfg.cultura.api.core.exception.ApiErrorBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

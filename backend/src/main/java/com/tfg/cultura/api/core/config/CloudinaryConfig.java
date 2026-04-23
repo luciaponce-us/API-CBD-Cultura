@@ -1,4 +1,4 @@
-package com.tfg.cultura.api.config;
+package com.tfg.cultura.api.core.config;
 
 import java.util.HashMap;
 import java.util.Map;

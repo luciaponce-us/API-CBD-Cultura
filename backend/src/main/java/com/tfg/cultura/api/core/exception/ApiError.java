@@ -1,4 +1,4 @@
-package com.tfg.cultura.api.config.exception;
+package com.tfg.cultura.api.core.exception;
 
 import java.time.LocalDateTime;
 

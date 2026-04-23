@@ -1,4 +1,4 @@
-package com.tfg.cultura.api.config;
+package com.tfg.cultura.api.core.config;
 
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;

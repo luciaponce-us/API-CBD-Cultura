@@ -1,4 +1,4 @@
-package com.tfg.cultura.api.config.exception;
+package com.tfg.cultura.api.core.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +32,9 @@ public class GlobalExceptionHandler {
         return apiErrorBuilder.build(ex,HttpStatus.BAD_REQUEST,"Errores de validación",logger,message);
     }
 
-    
-    
+    @ExceptionHandler(FileUploadException.class)
+    public ResponseEntity<ApiError> handleFileUploadException(FileUploadException ex) {
+        return apiErrorBuilder.build(ex, HttpStatus.INTERNAL_SERVER_ERROR, "Error al subir el archivo", logger);
+    }
 
 }

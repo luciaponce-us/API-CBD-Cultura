@@ -80,7 +80,7 @@ public class UserService {
         return new UserResponse(savedUser);
     }
 
-    public String login(UserLoginRequest request) {
+    public String login(UserLoginRequest request) throws UserNotFoundException, DisabledException, BadCredentialsException {
         Optional<User> user = userRepository.findByUsername(request.getUsername());
         if (user.isEmpty()) {
             logger.warn("Error al iniciar sesión: El usuario {} no existe", request.getUsername());
@@ -96,7 +96,7 @@ public class UserService {
         if (!passwordEncoder.matches(request.getPassword(), foundUser.getPassword())) {
             logger.warn("Error al iniciar sesión: El usuario {} introdujo una contraseña incorrecta",
                     request.getUsername());
-            throw new BadCredentialsException("Credenciales inválidaaaas");
+            throw new BadCredentialsException("Credenciales inválidas");
         }
 
         CustomUserDetails userDetails = (CustomUserDetails) userDetailsService

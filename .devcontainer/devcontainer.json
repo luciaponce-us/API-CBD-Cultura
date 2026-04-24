@@ -35,6 +35,9 @@
         "maven.executable.path": "/workspace/backend/mvnw",
         "[java]": {
           "editor.defaultFormatter": "redhat.java"
+        },
+        "sonarlint.analyzerProperties": {
+          "sonar.cfamily.enabled": "false"
         }
       }
     }

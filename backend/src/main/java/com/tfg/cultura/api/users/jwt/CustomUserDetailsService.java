@@ -1,0 +1,35 @@
+package com.tfg.cultura.api.users.jwt;
+
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.stereotype.Service;
+
+import com.tfg.cultura.api.users.repository.UserRepository;
+import com.tfg.cultura.api.users.exception.UserNotFoundException;
+import com.tfg.cultura.api.users.model.User;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Service
+public class CustomUserDetailsService implements UserDetailsService {
+
+    private final UserRepository userRepository;
+
+    public CustomUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    private static final Logger logger = LoggerFactory.getLogger("usersLogger");
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UserNotFoundException{
+
+        User user = userRepository.findByUsername(username).orElseThrow(() -> {
+                logger.warn("Error al iniciar sesión: El usuario {} no existe", username);
+                return new UserNotFoundException("El usuario con username " + username + " no existe");
+            });
+
+        return new CustomUserDetails(user);
+    }
+}

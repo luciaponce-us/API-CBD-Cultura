@@ -1,4 +1,4 @@
-package com.tfg.cultura.api;
+package com.tfg.cultura.api.core.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -6,34 +6,39 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import jakarta.annotation.PostConstruct;
+import com.tfg.cultura.api.users.jwt.JwtFilter;
+
 import java.util.List;
 
 @Configuration
 public class SecurityConfig {
-    
-    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+
+    private final JwtFilter jwtFilter;
+
+    public SecurityConfig(JwtFilter jwtFilter) {
+        this.jwtFilter = jwtFilter;
+    }
 
     @Value("${app.frontend.url}")
     private String frontendUrl;
-    
-    @PostConstruct
-    public void logConfiguration() {
-        logger.info("Frontend URL configurada: {}", frontendUrl);
-    }
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) {
         http
             .cors(Customizer.withDefaults())
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+                // Rutas públicas
                 .requestMatchers("/", "/api", "/api/").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/dummy", "/api/dummy/**").permitAll()
                 .requestMatchers(
@@ -47,9 +52,14 @@ public class SecurityConfig {
                     "/api/docs/**",
                     "/api/swagger-ui/**"
                 ).permitAll()
+                // Users
+                .requestMatchers(HttpMethod.POST, "/api/users/register").permitAll()
+                .requestMatchers(HttpMethod.POST,"/api/users/login").permitAll()
                 .anyRequest().authenticated()
             )
-            .httpBasic(Customizer.withDefaults());
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+            .httpBasic(basic -> basic.disable())
+            .formLogin(form -> form.disable());
 
         return http.build();
     }
@@ -66,4 +76,10 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
 }

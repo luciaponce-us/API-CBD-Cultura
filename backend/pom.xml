@@ -87,6 +87,22 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
+		<!-- Cloudinary -->
+			<dependency>
+				<groupId>com.cloudinary</groupId>
+				<artifactId>cloudinary-http5</artifactId>
+				<version>2.0.0</version>
+			</dependency>
+			<dependency>
+				<groupId>com.cloudinary</groupId>
+				<artifactId>cloudinary-taglib</artifactId>
+				<version>2.0.0</version>
+			</dependency>
+			<dependency>
+				<groupId>io.github.cdimascio</groupId>
+				<artifactId>dotenv-java</artifactId>
+				<version>2.2.4</version>
+			</dependency>
 		<!-- TEST -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -107,6 +123,30 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>5.23.0</version> <!-- Marzo 2026 -->
+			<scope>test</scope>
+		</dependency>
+		<!-- JWT -->
+		<dependency>
+    		<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>0.13.0</version>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-impl</artifactId>
+			<version>0.13.0</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-jackson</artifactId>
+			<version>0.13.0</version>
+			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
 
@@ -137,6 +177,25 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			<!-- Tests -->
+			 <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>properties</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>@{argLine} -javaagent:${org.mockito:mockito-core:jar}</argLine>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
@@ -145,18 +204,18 @@
 				<executions>
 					<!-- Inicializa JaCoCo antes de los tests -->
 					<execution>
-					<goals>
-						<goal>prepare-agent</goal>
-					</goals>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
 					</execution>
 
 					<!-- Genera el reporte después de los tests -->
 					<execution>
-					<id>report</id>
-					<phase>verify</phase>
-					<goals>
-						<goal>report</goal>
-					</goals>
+						<id>report</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>

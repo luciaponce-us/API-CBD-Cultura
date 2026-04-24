@@ -1,6 +1,7 @@
 package com.tfg.cultura.api.suggestions.service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -45,8 +46,10 @@ public class SuggestionService {
             logger.warn("Error al crear la sugerencia: No se ha podido obtener la información del usuario");
             throw new UnathenticatedException("No se ha podido obtener la información del usuario");
         }
-        String loggedUserId = user.getId();
-        if (!userRepository.existsById(loggedUserId)) {
+        String authorId = user.getId();
+        Optional<User> optionalAuthor = userRepository.findById(authorId);
+
+        if (optionalAuthor.isEmpty()) {
             logger.warn("Error al crear la sugerencia: El usuario logeado no existe");
             throw new UserNotFoundException("El usuario logeado no existe");
         }
@@ -54,25 +57,30 @@ public class SuggestionService {
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .type(request.getType())
-                .authorId(loggedUserId)
+                .authorId(authorId)
                 .build();
 
         Suggestion savedSuggestion = repository.save(suggestion);
-        logger.info("Sugerencia creada con ID {} por el usuario con ID {}", savedSuggestion.getId(), loggedUserId);
+        logger.info("Sugerencia creada con ID {} por el usuario con ID {}", savedSuggestion.getId(), authorId);
+
         return toResponse(savedSuggestion);
     }
 
     public List<SuggestionResponse> getAll() {
-        return repository.findAllByOrderByTotalSupportersDesc().stream().map(this::toResponse).toList();
+        return repository.findAllByOrderByTotalSupportersDesc()
+                .stream()
+                .filter(Objects::nonNull)
+                .map(this::toResponse)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     private SuggestionResponse toResponse(Suggestion suggestion) throws UserNotFoundException {
         Optional<User> optionalAuthor = userRepository.findById(suggestion.getAuthorId());
 
         if (optionalAuthor.isEmpty()) {
-            logger.warn("Error al convertir la sugerencia a respuesta: No se ha podido encontrar el autor con ID {}",
-                    suggestion.getAuthorId());
-            throw new UserNotFoundException("No se ha podido encontrar el autor de la sugerencia");
+            logger.warn("Error al convertir la sugerencia a respuesta: El autor de la sugerencia no existe");
+            return null;
         }
 
         User author = optionalAuthor.get();

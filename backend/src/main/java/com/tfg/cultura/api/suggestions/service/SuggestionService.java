@@ -62,6 +62,10 @@ public class SuggestionService {
         return toResponse(savedSuggestion);
     }
 
+    public List<SuggestionResponse> getAll() {
+        return repository.findAllByOrderByTotalSupportersDesc().stream().map(this::toResponse).toList();
+    }
+
     private SuggestionResponse toResponse(Suggestion suggestion) throws UserNotFoundException {
         Optional<User> optionalAuthor = userRepository.findById(suggestion.getAuthorId());
 

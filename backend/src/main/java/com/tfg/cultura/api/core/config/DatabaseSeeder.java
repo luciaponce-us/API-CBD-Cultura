@@ -6,11 +6,15 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import com.tfg.cultura.api.suggestions.model.Suggestion;
+import com.tfg.cultura.api.suggestions.model.enumerators.SuggestionType;
 import com.tfg.cultura.api.users.model.User;
 import com.tfg.cultura.api.users.model.enumerators.Role;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +48,8 @@ public class DatabaseSeeder implements CommandLineRunner {
     private void seedDatabase() {
         clearDatabase();
         
-        seedUsuarios();
+        List<User> usuarios = seedUsuarios();
+        seedSugerencias(usuarios);
         
         logger.info("💾 Todos los datos se han guardado correctamente");
     }
@@ -59,7 +64,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         });
     }
 
-    private void seedUsuarios() {
+    private List<User> seedUsuarios() {
         logger.info("👥 Creando colección: users");
 
         String password = "cultura123"; //NOSONAR
@@ -137,8 +142,55 @@ public class DatabaseSeeder implements CommandLineRunner {
             socio
         );
 
-        mongoTemplate.insertAll(usuarios);
-        logger.info("✅👥 Insertados {} usuarios", usuarios.size());
+        Collection<User> users = mongoTemplate.insertAll(usuarios);
+        logger.info("✅👥 Insertados {} usuarios", users.size());
+        return users.stream().toList();
+    }
+
+    private void seedSugerencias(List<User> usuarios) {
+        logger.info("💡 Creando colección: suggestions");
+
+        String idCoordinador = usuarios.get(0).getId();
+        String idSecretario = usuarios.get(1).getId();
+        String idEncargado = usuarios.get(2).getId();
+        String idColaborador = usuarios.get(3).getId();
+        String idSocio = usuarios.get(4).getId();
+
+        Suggestion s1 = Suggestion.builder()
+            .title("Añadir torneos de juegos de mesa")
+            .description("Organizar torneos mensuales de juegos como Catan, Carcassonne o Terraforming Mars.")
+            .type(SuggestionType.EVENT)
+            .authorId(idColaborador)
+            .build();
+
+        Suggestion s2 = Suggestion.builder()
+            .title("Ampliar catálogo de mangas")
+            .description("Incluir colecciones populares actuales y completar series incompletas.")
+            .type(SuggestionType.CATALOG)
+            .authorId(idSocio)
+            .supportersId(List.of(idColaborador, idSecretario, idCoordinador))
+            .totalSupporters(3)
+            .build();
+        
+        Suggestion s3 = Suggestion.builder()
+            .title("Talleres de iniciación al rol")
+            .description("Crear talleres para aprender a jugar a rol, incluyendo partidas guiadas para principiantes.")
+            .type(SuggestionType.EVENT)
+            .authorId(idSocio)
+            .supportersId(List.of(idEncargado))
+            .totalSupporters(1)
+            .build();
+        
+        Suggestion s4 = Suggestion.builder()
+            .title("Ciclo de cine temático")
+            .description("Organizar ciclos de cine por temáticas (terror, ciencia ficción, anime, etc.).")
+            .type(SuggestionType.EVENT)
+            .authorId(idSocio)
+            .build();
+
+        List<Suggestion> sugerencias = List.of(s1,s2,s3,s4);
+        mongoTemplate.insertAll(sugerencias);
+        logger.info("✅💡 Insertadas {} sugerencias", sugerencias.size());
     }
 
 }

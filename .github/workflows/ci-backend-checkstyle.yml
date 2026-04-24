@@ -44,4 +44,4 @@ jobs:
         working-directory: backend
 
       - name: Run Checkstyle
-        run: ./mvnw clean verify
+        run: ./mvnw clean verify -Dspring.profiles.active=test

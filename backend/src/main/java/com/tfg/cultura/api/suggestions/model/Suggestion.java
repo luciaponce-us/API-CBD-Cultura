@@ -1,8 +1,10 @@
 package com.tfg.cultura.api.suggestions.model;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -36,7 +38,7 @@ public class Suggestion {
     private String description;
 
     @Builder.Default
-    @NotBlank(message = "El tipo de sugerencia es obligatorio")
+    @NotNull(message = "El tipo de sugerencia es obligatorio")
     private SuggestionType type = SuggestionType.OTHER;
 
     @NotBlank(message = "El autor es obligatorio")
@@ -49,5 +51,8 @@ public class Suggestion {
     @Builder.Default
     @Min(value=0, message="El número de apoyos no puede ser inferior a 0")
     private int totalSupporters = 0;
+
+    @CreatedDate
+    private LocalDateTime createdAt;
 
 }

@@ -37,4 +37,9 @@ public class GlobalExceptionHandler {
         return apiErrorBuilder.build(ex, HttpStatus.INTERNAL_SERVER_ERROR, "Error al subir el archivo", logger);
     }
 
+    @ExceptionHandler(UnathenticatedException.class)
+    public ResponseEntity<ApiError> handleUnathenticatedException(UnathenticatedException ex) {
+        return apiErrorBuilder.build(ex, HttpStatus.UNAUTHORIZED, "No autenticado", logger);
+    }
+
 }

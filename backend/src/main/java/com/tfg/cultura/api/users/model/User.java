@@ -70,7 +70,8 @@ public class User {
         regexp = "^https://res\\.cloudinary\\.com/[^/]+/(image|raw|video)/upload/.+",
         message = "URL de Cloudinary no válida"
     )
-    private String avatar;
+    @Builder.Default
+    private String avatar = "https://res.cloudinary.com/dubz79y98/image/upload/v1776288595/avatar_placeholder_dreac3.png";
 
     @Builder.Default
     @NotBlank(message = "El campo de activación es obligatorio")

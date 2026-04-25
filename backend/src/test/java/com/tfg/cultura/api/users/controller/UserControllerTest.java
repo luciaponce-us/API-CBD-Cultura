@@ -1,29 +1,24 @@
 package com.tfg.cultura.api.users.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import org.mockito.Mockito;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-import com.tfg.cultura.api.core.exception.ApiErrorBuilder;
-import com.tfg.cultura.api.core.exception.GlobalExceptionHandler;
 import com.tfg.cultura.api.users.exception.UserAlreadyExistsException;
 import com.tfg.cultura.api.users.exception.UserNotFoundException;
 import com.tfg.cultura.api.users.exception.UsersExceptionHandler;
-import com.tfg.cultura.api.users.model.User;
+import com.tfg.cultura.api.users.factory.UserFactory;
 import com.tfg.cultura.api.users.model.dto.UserLoginRequest;
 import com.tfg.cultura.api.users.model.dto.UserRegisterRequest;
 import com.tfg.cultura.api.users.model.dto.UserResponse;
 import com.tfg.cultura.api.users.service.UserService;
+import com.tfg.cultura.api.utils.BaseControllerTest;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -32,9 +27,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-class UserControllerTest {
+class UserControllerTest extends BaseControllerTest {
+
     private MockMvc mockMvc;
+
+    @Mock
     private UserService userService;
+
     private static final String BASE_URL = "/api/users";
     private static final String REGISTER_URL = BASE_URL + "/register";
     private static final String LOGIN_URL = BASE_URL + "/login";
@@ -42,53 +41,20 @@ class UserControllerTest {
     private UserRegisterRequest registerRequest;
     private UserLoginRequest loginRequest;
     private UserResponse userResponse;
-    private ApiErrorBuilder apiErrorBuilder = new ApiErrorBuilder();
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setup() {
-        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
-        validator.afterPropertiesSet();
-
-        userService = Mockito.mock(UserService.class);
-
+        MockitoAnnotations.openMocks(this);
         UserController controller = new UserController(userService);
+        mockMvc = buildMockMvc(controller, UsersExceptionHandler.class);
 
-        mockMvc = MockMvcBuilders
-                .standaloneSetup(controller)
-                .setValidator(validator)
-                .setControllerAdvice(
-                        new GlobalExceptionHandler(apiErrorBuilder),
-                        new UsersExceptionHandler(apiErrorBuilder))
-                .build();
+        initTestData();
+    }
 
-        registerRequest = UserRegisterRequest.builder()
-                .username("test")
-                .password("12345678")
-                .name("John")
-                .surname("Doe")
-                .dni("12345678Z")
-                .phone("600123123")
-                .email("test@test.com")
-                .build();
-
-        User createdUser = User.builder()
-                .username("test")
-                .password("12345678-encrypted")
-                .name("John")
-                .surname("Doe")
-                .dni("12345678Z")
-                .phone("600123123")
-                .email("test@test.com")
-                .build();
-
-        userResponse = new UserResponse(createdUser);
-
-        loginRequest = UserLoginRequest.builder()
-                .username("test")
-                .password("12345678")
-                .build();
-
+    private void initTestData() {
+        registerRequest = UserFactory.validUserRegisterRequest();
+        userResponse = UserFactory.validUserResponse();
+        loginRequest = UserFactory.loginRequest();
     }
 
     @Test
@@ -179,10 +145,6 @@ class UserControllerTest {
     }
 
     // Helpers
-
-    private String toJson(Object obj) throws Exception {
-        return objectMapper.writeValueAsString(obj);
-    }
 
     private MockMultipartFile userPart(Object obj) throws Exception {
         return new MockMultipartFile(

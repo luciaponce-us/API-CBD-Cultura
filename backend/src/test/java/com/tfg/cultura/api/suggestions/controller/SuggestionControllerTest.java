@@ -2,8 +2,11 @@ package com.tfg.cultura.api.suggestions.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,7 +63,7 @@ class SuggestionControllerTest extends BaseControllerTest {
     @Test
     void create_success() throws Exception {
         when(service.create(any(SuggestionCreateRequest.class))).thenReturn(response);
-        
+
         mockMvc.perform(post(CREATE_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(toJson(request)))
@@ -106,6 +109,17 @@ class SuggestionControllerTest extends BaseControllerTest {
                 .content(toJson(request)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").exists());
+    }
+
+    // GET ALL SUGGESTIONS
+
+    @Test
+    void getAll_success() throws Exception {
+        when(service.getAll()).thenReturn(List.of(response));
+
+        mockMvc.perform(get(BASE_URL))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value(suggestion.getTitle()));
     }
 
 }

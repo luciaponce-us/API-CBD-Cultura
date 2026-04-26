@@ -25,7 +25,7 @@ public class SuggestionResponse {
         this.type = suggestion.getType();
         this.author = author;
         this.someSupportersAvatars = someSupportersAvatars;
-        this.totalSupporters = suggestion.getTotalSupporters();
+        this.totalSupporters = suggestion.countSupporters();
         this.createdAt = suggestion.getCreatedAt();
     }
 }

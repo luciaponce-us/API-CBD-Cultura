@@ -36,7 +36,7 @@ public class DatabaseSeeder implements CommandLineRunner {
     public void run(String... args) throws Exception {
         logger.info("🌱 Iniciando Database Seeder...");
         logger.info(" - Database: {}", mongoTemplate.getDb().getName());
-        logger.info(" - MongoTemplate instance: {}", mongoTemplate);
+        
         try {
             seedDatabase();
             logger.info("✅ Database seeding completado exitosamente");
@@ -169,7 +169,6 @@ public class DatabaseSeeder implements CommandLineRunner {
             .type(SuggestionType.CATALOG)
             .authorId(idSocio)
             .supportersId(List.of(idColaborador, idSecretario, idCoordinador))
-            .totalSupporters(3)
             .build();
         
         Suggestion s3 = Suggestion.builder()
@@ -178,7 +177,6 @@ public class DatabaseSeeder implements CommandLineRunner {
             .type(SuggestionType.EVENT)
             .authorId(idSocio)
             .supportersId(List.of(idEncargado))
-            .totalSupporters(1)
             .build();
         
         Suggestion s4 = Suggestion.builder()

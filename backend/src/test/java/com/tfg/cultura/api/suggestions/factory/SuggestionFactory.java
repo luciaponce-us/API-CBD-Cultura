@@ -20,7 +20,6 @@ public class SuggestionFactory {
             .type(SuggestionType.CATALOG)
             .authorId(author.getId())
             .supportersId(List.of("2","3"))
-            .totalSupporters(2)
             .build();
     }
 

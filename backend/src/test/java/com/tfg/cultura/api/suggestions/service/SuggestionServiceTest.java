@@ -68,7 +68,6 @@ class SuggestionServiceTest {
             .type(SuggestionType.CATALOG)
             .authorId(user.getId())
             .supportersId(List.of("2","3"))
-            .totalSupporters(2)
             .build();
         
         request = SuggestionCreateRequest.builder()
@@ -146,7 +145,7 @@ class SuggestionServiceTest {
 
     @Test
     void getAll_should_return_sorted_suggestions() throws UserNotFoundException {
-        when(repository.findAllByOrderByTotalSupportersDesc()).thenReturn(List.of(suggestion));
+        when(repository.findAll()).thenReturn(List.of(suggestion));
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
 
         List<SuggestionResponse> responses = service.getAll();
@@ -159,7 +158,7 @@ class SuggestionServiceTest {
 
     @Test
     void getAll_should_return_empty_list_if_no_suggestions() {
-        when(repository.findAllByOrderByTotalSupportersDesc()).thenReturn(List.of());
+        when(repository.findAll()).thenReturn(List.of());
 
         List<SuggestionResponse> responses = service.getAll();
 
@@ -169,7 +168,7 @@ class SuggestionServiceTest {
 
     @Test
     void toResponse_should_return_null_if_author_not_exists() throws UserNotFoundException {
-        when(repository.findAllByOrderByTotalSupportersDesc()).thenReturn(List.of(suggestion));
+        when(repository.findAll()).thenReturn(List.of(suggestion));
         when(userRepository.findById(any())).thenReturn(Optional.empty());
 
         List<SuggestionResponse> response = service.getAll();

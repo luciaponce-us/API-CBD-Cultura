@@ -10,7 +10,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.tfg.cultura.api.suggestions.model.enumerators.SuggestionType;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -48,11 +47,10 @@ public class Suggestion {
     @NotNull
     private List<String> supportersId = new ArrayList<>();
 
-    @Builder.Default
-    @Min(value=0, message="El número de apoyos no puede ser inferior a 0")
-    private int totalSupporters = 0;
-
     @CreatedDate
     private LocalDateTime createdAt;
 
+    public int countSupporters() {
+        return this.supportersId.size();
+    }
 }

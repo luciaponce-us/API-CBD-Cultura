@@ -1,5 +1,6 @@
 package com.tfg.cultura.api.suggestions.service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -67,9 +68,10 @@ public class SuggestionService {
     }
 
     public List<SuggestionResponse> getAll() {
-        return repository.findAllByOrderByTotalSupportersDesc()
+        return repository.findAll()
                 .stream()
                 .filter(Objects::nonNull)
+                .sorted(Comparator.comparing(Suggestion::countSupporters).reversed())
                 .map(this::toResponse)
                 .filter(Objects::nonNull)
                 .toList();

@@ -25,7 +25,7 @@ public class MongoConfig {
     @Bean
     @Primary
     public MongoClient mongoClient() {
-        log.info("📦 Configurando MongoClient con URI: {}", mongoUri);
+        // log.info("📦 Configurando MongoClient con URI: {}", mongoUri);
         return MongoClients.create(mongoUri);
     }
 

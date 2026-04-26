@@ -36,7 +36,7 @@ public class DatabaseSeeder implements CommandLineRunner {
     public void run(String... args) throws Exception {
         logger.info("🌱 Iniciando Database Seeder...");
         logger.info(" - Database: {}", mongoTemplate.getDb().getName());
-        logger.info(" - MongoTemplate instance: {}", mongoTemplate);
+        
         try {
             seedDatabase();
             logger.info("✅ Database seeding completado exitosamente");

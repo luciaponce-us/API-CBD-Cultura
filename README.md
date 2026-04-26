@@ -14,7 +14,7 @@ Consulta la documentación completa en la [wiki del repositorio](https://github.
 
 ## Instalación
 
-Consulta el manual de instalación [aquí](https://github.com/luciaponce-us/TFG-Cultura/wiki/Instalaci%C3%B3n).
+Consulta el manual de instalación [aquí](https://github.com/luciaponce-us/API-CBD-Cultura/wiki).
 
 ## Licencia
 

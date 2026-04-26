@@ -5,7 +5,11 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -68,6 +72,38 @@ public class UserController {
                 return ResponseEntity
                                 .status(HttpStatus.OK)
                                 .body(token);
+        }
+
+        @Operation(summary = "Obtener información de un usuario concreto", description = "Como colaborador/encargado/secretario/coordinador, quiero poder consultar la información de un usuario concreto, para poder revisar su información personal y realizar las operaciones CRUD")
+        @ApiResponses(value = {
+                @ApiResponse(responseCode = "200", description = "Usuario obtenido correctamente"),
+                @ApiResponse(responseCode = "401", description = "Unauthorized - El usuario no está autenticado"),
+                @ApiResponse(responseCode = "403", description = "Forbidden - El usuario no tiene permisos para aprobar registros"),
+                @ApiResponse(responseCode = "404", description = "User Not Found - No se encontró el usuario a aprobar/rechazar")
+        })
+        @GetMapping("/{id}")
+        @PreAuthorize("hasAnyRole('COLABORADOR', 'ENCARGADO', 'SECRETARIO', 'COORDINADOR')")
+        public ResponseEntity<UserResponse> getById(@PathVariable String id){
+                UserResponse response = userService.getUserById(id);
+                return ResponseEntity
+                        .status(HttpStatus.OK)
+                        .body(response);
+        }
+
+        @Operation(summary="RF-05: Aprobar el registro de un usuario", description = "Como colaborador/encargado/secretario/coordinador, quiero poder aprobar o rechazar el registro de un usuario, para revisar que la carta de pago sea auténtica y pertenezca al usuario que solicita registrarse")
+        @ApiResponses(value = {
+                @ApiResponse(responseCode = "200", description = "Registro aprobado/rechazado correctamente"),
+                @ApiResponse(responseCode = "401", description = "Unauthorized - El usuario no está autenticado"),
+                @ApiResponse(responseCode = "403", description = "Forbidden - El usuario no tiene permisos para aprobar registros o activar ese usuario"),
+                @ApiResponse(responseCode = "404", description = "User Not Found - No se encontró el usuario a aprobar/rechazar")
+        })
+        @PutMapping("/{id}/activate")
+        @PreAuthorize("hasAnyRole('COLABORADOR', 'ENCARGADO', 'SECRETARIO', 'COORDINADOR')")
+        public ResponseEntity<UserResponse> activateUser(@PathVariable String id){
+                UserResponse response = userService.activateUser(id);
+                return ResponseEntity
+                        .status(HttpStatus.OK)
+                        .body(response);
         }
 
 }

@@ -55,6 +55,9 @@ public class SecurityConfig {
                 // Users
                 .requestMatchers(HttpMethod.POST, "/api/users/register").permitAll()
                 .requestMatchers(HttpMethod.POST,"/api/users/login").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/users/{id}").hasAnyRole("COLABORADOR", "ENCARGADO", "SECRETARIO", "COORDINADOR")
+                .requestMatchers(HttpMethod.PUT, "/api/users/{id}/activate").hasAnyRole("COLABORADOR", "ENCARGADO", "SECRETARIO", "COORDINADOR")
+                // Suggestions
                 .requestMatchers(HttpMethod.GET, "/api/suggestions").permitAll()
                 .anyRequest().authenticated()
             )

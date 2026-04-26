@@ -2,6 +2,8 @@ package com.tfg.cultura.api.users.service;
 
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,6 +13,7 @@ import com.tfg.cultura.api.users.repository.UserRepository;
 import com.tfg.cultura.api.users.model.User;
 import com.tfg.cultura.api.users.model.dto.*;
 import com.cloudinary.Transformation;
+import com.tfg.cultura.api.core.exception.UnathenticatedException;
 import com.tfg.cultura.api.core.model.dto.FileUploadRequest;
 import com.tfg.cultura.api.core.service.FileService;
 import com.tfg.cultura.api.users.exception.*;
@@ -128,6 +131,54 @@ public class UserService {
             return AVATAR_PLACEHOLDER;
         }
 
+    }
+
+    public UserResponse getUserById(String id) throws UserNotFoundException {
+        User user = findUserById(id);
+        return new UserResponse(user);
+    }
+
+    public UserResponse activateUser(String id) throws UserNotFoundException {
+
+        User user = findUserById(id);
+        CustomUserDetails currentUser = getCurrentUserDetails();
+
+        if (user.getId().equals(currentUser.getId())) {
+            throw new SelfActivationNotAllowedException(String.format("El usuario %s con id %s ha intentado activar su propio usuario", user.getUsername(), user.getId()));
+        }
+
+        if (!user.isActive()){
+            user.setActive(true);
+            user = userRepository.save(user);
+        }
+
+        logger.info("Se ha aprobado el registro del usuario {} con id {}", user.getUsername(), user.getId());
+        return new UserResponse(user);
+    }
+
+    private User findUserById(String id) throws UserNotFoundException {
+        Optional<User> user = userRepository.findById(id);
+
+        if (user.isEmpty()) {
+            logger.warn("Error al obtener el usuario: El usuario con id {} no existe", id);
+            throw new UserNotFoundException("El usuario con id " + id + " no existe");
+        }
+
+        return user.get();
+    }
+
+    private CustomUserDetails getCurrentUserDetails() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            throw new UnathenticatedException("No se ha podido obtener la autenticación del usuario");
+        }
+
+        CustomUserDetails currentUser = (CustomUserDetails) auth.getPrincipal();
+        if (currentUser == null) {
+            throw new UnathenticatedException("No se ha podido obtener la información del usuario");
+        }
+
+        return currentUser;
     }
 
 }

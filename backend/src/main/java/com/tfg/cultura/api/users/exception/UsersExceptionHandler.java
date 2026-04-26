@@ -58,4 +58,13 @@ public class UsersExceptionHandler {
             usersLogger);
     }
 
+    @ExceptionHandler(SelfActivationNotAllowedException.class)
+    public ResponseEntity<ApiError> handleSelfActivationNotAllowedException(SelfActivationNotAllowedException ex) {
+        return apiErrorBuilder.build(
+            ex,
+            HttpStatus.FORBIDDEN,
+            "Self Activation Not Allowed",
+            usersLogger);
+    }
+
 }
